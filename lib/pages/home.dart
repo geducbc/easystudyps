@@ -13,8 +13,20 @@ import 'package:studyapp/redux/reducers.dart';
 import 'package:studyapp/redux/actions.dart';
 
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   // final int _selectedIndex = 0;
+  Map<String,dynamic> loggedInUser;
+  Home();
+  Home.fromHome(this.loggedInUser);
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return _HomeState();
+  }
+  
+}
+
+class _HomeState extends State<Home>{
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static final List<Widget> _widgetOptions = <Widget>[
@@ -27,6 +39,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('user  '+ widget.loggedInUser.toString());
     return StoreConnector<AppState, AppState>(
       converter: (store) => store.state,
     builder: (context, state) {

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:studyapp/model/app_state.dart';
+import 'package:studyapp/redux/actions.dart';
 
 class Learning extends StatelessWidget{
   Color schoolColor(String schoolType){
@@ -31,6 +34,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('primary'));
                         Navigator.of(context).pushNamed('/selectSubjects/primary1');
                       }
                     ,),
@@ -42,6 +46,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('primary'));
                         Navigator.of(context).pushNamed('/selectSubjects/primary2');
                       }
                     ,),
@@ -53,6 +58,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('primary'));
                         Navigator.of(context).pushNamed('/selectSubjects/primary3');
                       }
                     ,),
@@ -64,6 +70,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('primary'));
                         Navigator.of(context).pushNamed('/selectSubjects/primary4');
                       }
                     ,),
@@ -75,6 +82,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('primary'));
                         Navigator.of(context).pushNamed('/selectSubjects/primary5');
                       }
                     ,),
@@ -86,6 +94,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('primary'));
                         Navigator.of(context).pushNamed('/selectSubjects/primary6');
                       }
                     ,)
@@ -116,6 +125,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('Junior School'));
                         Navigator.of(context).pushNamed('/selectSubjects/js1');
                       }
                     ,),
@@ -127,17 +137,19 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('Junior School'));
                         Navigator.of(context).pushNamed('/selectSubjects/js2');
                       }
                     ,),
               FlatButton(child: Card(
                         child: ListTile(
-                          title: Text('JS Thre'),
+                          title: Text('JS Three'),
                           leading: Icon(Icons.class_),
                         ),
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('Junior School'));
                         Navigator.of(context).pushNamed('/selectSubjects/js3');
                       }
                     ,),
@@ -168,6 +180,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('Senior School'));
                         Navigator.of(context).pushNamed('/selectSubjects/ss1');
                       }
                     ,),
@@ -179,6 +192,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('Senior School'));
                         Navigator.of(context).pushNamed('/selectSubjects/ss2');
                       }
                     ,),
@@ -190,6 +204,7 @@ class Learning extends StatelessWidget{
                       ),
                       onPressed: (){
                         Navigator.pop(context);
+                        StoreProvider.of<AppState>(context).dispatch(EducationLevel('Senior School'));
                         Navigator.of(context).pushNamed('/selectSubjects/ss3');
                       }
               ,),
@@ -201,7 +216,10 @@ class Learning extends StatelessWidget{
   }
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return StoreConnector<AppState, AppState>(
+      converter: (store) => store.state,
+      builder: (context, state){
+        return ListView(
               padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
 
               children: <Widget>[
@@ -255,12 +273,15 @@ class Learning extends StatelessWidget{
                                   ),
                                 ),
                       ), onTap: (){
+                          StoreProvider.of<AppState>(context).dispatch(SchoolLevel(schoolType));
                         _handleEducationLevelSelect(context,schoolType);
                       },); 
                   
                 }).toList(),
                 ),
-        ],);
+        ],
+        );
+      } ,);
   }
 }
 

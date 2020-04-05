@@ -5,6 +5,9 @@ import 'package:studyapp/pages/home.dart';
 import 'package:video_player/video_player.dart';
 import 'package:studyapp/redux/actions.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'dart:convert';
 
 class VideoPlayerWidget extends StatefulWidget{
   @override
@@ -18,11 +21,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>{
   bool videoLoaded = false;
   bool foundLocalRes = false;
   VideoPlayerController _controller;
-  final String user = 'Bukola Damola';
+  final String user = 'Bukola Damola ';
   _getVideoRes(Map<String, dynamic> material){
       if(!foundLocalRes){
         print(material.toString());
-        _controller = VideoPlayerController.network(material['url']);
+        _controller = VideoPlayerController.network(material['file_url']);
       }
       _controller.addListener(() {
         setState(() {
@@ -50,6 +53,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>{
     super.dispose();
     _controller.dispose();
   }
+  Future<String> getLoggedInUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var user = json.decode(prefs.getString('user'));
+    return user['firstName'] + " " + user['lastName'];
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -61,84 +70,243 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>{
         }
         return Scaffold(
             appBar: AppBar(
-            title: Text(state.selectedMaterial['name']),
+            title: Text(state.selectedMaterial['file_name']),
             backgroundColor: Colors.blueAccent,
           ),
-          endDrawer: Drawer(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment:  CrossAxisAlignment.start,
-            children: <Widget>[
-            Container(
+          endDrawer: FutureBuilder(
+        future: getLoggedInUser() ,
+        builder: (context, AsyncSnapshot snapshot){
+              if(snapshot.connectionState == ConnectionState.done){
+                 if(snapshot.hasData){
+                      return  Drawer(
+                            child: SafeArea(
+                              child: Column(
+                                crossAxisAlignment:  CrossAxisAlignment.start,
+                                children: <Widget>[
+                                Container(
 
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.greenAccent,
-              ),
-              child: Center(
-                child: Text(user,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+                                  height: 200,
+                                  decoration: BoxDecoration(
+                                    color: Colors.greenAccent,
+                                  ),
+                                  child: Center(
+                                    child: Text(snapshot.data,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
 
-                    color: Colors.white, fontFamily: 'Gilroy',
-                      fontSize: 26,
-                     fontWeight: FontWeight.w800
-                    ),
-                ) ,)
-            ,),
-            SizedBox(height: 20,),
-            FlatButton(child: Card(
-                        child: ListTile(
-                          title: Text('Home'),
-                          leading: Icon(Icons.home),
+                                        color: Colors.white, fontFamily: 'Gilroy',
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.w800
+                                        ),
+                                    ) ,)
+                                ,),
+                                SizedBox(height: 20,),
+                                FlatButton(child: Card(
+                                            child: ListTile(
+                                              title: Text('Home'),
+                                              leading: Icon(Icons.home),
+                                            ),
+                                          ),
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                  StoreProvider.of<AppState>(context).dispatch(TabIndex(0));
+                                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                                }
+                                ),
+                                FlatButton(child: Card(
+                                            child: ListTile(
+                                              title: Text('Learning'),
+                                              leading: Icon(LineIcons.book),
+                                            ),
+                                          ),
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                  StoreProvider.of<AppState>(context).dispatch(TabIndex(1));
+                                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                                }
+                                ),
+                                FlatButton(child: Card(
+                                            child: ListTile(
+                                              title: Text('Classroom'),
+                                              leading: Icon(LineIcons.users),
+                                            ),
+                                          ),
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                  StoreProvider.of<AppState>(context).dispatch(TabIndex(2));
+                                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                                }
+                                ),
+                                FlatButton(child: Card(
+                                            child: ListTile(
+                                              title: Text('Profile'),
+                                              leading: Icon(LineIcons.user),
+                                            ),
+                                          ),
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                  StoreProvider.of<AppState>(context).dispatch(TabIndex(3));
+                                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                                }
+                                )
+                            ],)
+                            ,) 
+                            
+                          );
+                 }
+                 return  Drawer(
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment:  CrossAxisAlignment.start,
+                children: <Widget>[
+                Container(
+
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.greenAccent,
+                  ),
+                  child: Center(
+                    child: Text('',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+
+                        color: Colors.white, fontFamily: 'Gilroy',
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800
                         ),
-                      ),
-            onPressed: (){
-              Navigator.pop(context);
-              StoreProvider.of<AppState>(context).dispatch(TabIndex(0));
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
-            }
-            ),
-            FlatButton(child: Card(
-                        child: ListTile(
-                          title: Text('Learning'),
-                          leading: Icon(LineIcons.book),
+                    ) ,)
+                ,),
+                SizedBox(height: 20,),
+                FlatButton(child: Card(
+                            child: ListTile(
+                              title: Text('Home'),
+                              leading: Icon(Icons.home),
+                            ),
+                          ),
+                onPressed: (){
+                  Navigator.pop(context);
+                  StoreProvider.of<AppState>(context).dispatch(TabIndex(0));
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                }
+                ),
+                FlatButton(child: Card(
+                            child: ListTile(
+                              title: Text('Learning'),
+                              leading: Icon(LineIcons.book),
+                            ),
+                          ),
+                onPressed: (){
+                  Navigator.pop(context);
+                  StoreProvider.of<AppState>(context).dispatch(TabIndex(1));
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                }
+                ),
+                FlatButton(child: Card(
+                            child: ListTile(
+                              title: Text('Classroom'),
+                              leading: Icon(LineIcons.users),
+                            ),
+                          ),
+                onPressed: (){
+                  Navigator.pop(context);
+                  StoreProvider.of<AppState>(context).dispatch(TabIndex(2));
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                }
+                ),
+                FlatButton(child: Card(
+                            child: ListTile(
+                              title: Text('Profile'),
+                              leading: Icon(LineIcons.user),
+                            ),
+                          ),
+                onPressed: (){
+                  Navigator.pop(context);
+                  StoreProvider.of<AppState>(context).dispatch(TabIndex(3));
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                }
+                )
+            ],)
+            ,) 
+            
+          );
+              }
+              return  Drawer(
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment:  CrossAxisAlignment.start,
+                children: <Widget>[
+                Container(
+
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.greenAccent,
+                  ),
+                  child: Center(
+                    child: Text('',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+
+                        color: Colors.white, fontFamily: 'Gilroy',
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800
                         ),
-                      ),
-            onPressed: (){
-              Navigator.pop(context);
-              StoreProvider.of<AppState>(context).dispatch(TabIndex(1));
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
-            }
-            ),
-            FlatButton(child: Card(
-                        child: ListTile(
-                          title: Text('Classroom'),
-                          leading: Icon(LineIcons.users),
-                        ),
-                      ),
-            onPressed: (){
-              Navigator.pop(context);
-              StoreProvider.of<AppState>(context).dispatch(TabIndex(2));
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
-            }
-            ),
-            FlatButton(child: Card(
-                        child: ListTile(
-                          title: Text('Profile'),
-                          leading: Icon(LineIcons.user),
-                        ),
-                      ),
-            onPressed: (){
-              Navigator.pop(context);
-              StoreProvider.of<AppState>(context).dispatch(TabIndex(3));
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
-            }
-            )
-        ],)
-        ,) 
-        
-      ),
+                    ) ,)
+                ,),
+                SizedBox(height: 20,),
+                FlatButton(child: Card(
+                            child: ListTile(
+                              title: Text('Home'),
+                              leading: Icon(Icons.home),
+                            ),
+                          ),
+                onPressed: (){
+                  Navigator.pop(context);
+                  StoreProvider.of<AppState>(context).dispatch(TabIndex(0));
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                }
+                ),
+                FlatButton(child: Card(
+                            child: ListTile(
+                              title: Text('Learning'),
+                              leading: Icon(LineIcons.book),
+                            ),
+                          ),
+                onPressed: (){
+                  Navigator.pop(context);
+                  StoreProvider.of<AppState>(context).dispatch(TabIndex(1));
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                }
+                ),
+                FlatButton(child: Card(
+                            child: ListTile(
+                              title: Text('Classroom'),
+                              leading: Icon(LineIcons.users),
+                            ),
+                          ),
+                onPressed: (){
+                  Navigator.pop(context);
+                  StoreProvider.of<AppState>(context).dispatch(TabIndex(2));
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                }
+                ),
+                FlatButton(child: Card(
+                            child: ListTile(
+                              title: Text('Profile'),
+                              leading: Icon(LineIcons.user),
+                            ),
+                          ),
+                onPressed: (){
+                  Navigator.pop(context);
+                  StoreProvider.of<AppState>(context).dispatch(TabIndex(3));
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Home()) );
+                }
+                )
+            ],)
+            ,) 
+            
+          );
+          } 
+        ,),
                   body: AspectRatio(
               aspectRatio: _controller.value.aspectRatio,
               child: Stack(

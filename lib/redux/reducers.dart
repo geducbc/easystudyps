@@ -16,5 +16,14 @@ AppState reducer(AppState prevState, dynamic action){
   if(action is SelectedRoom){
     newState.selectedRoom = action.payload;
   }
+  if(action is EducationLevel){
+    newState.educationLevel = action.payload;
+  }
+  if(action is SchoolLevel){
+    newState.schoolLevel = action.payload;
+  }
+  if(action is MaterialLoaded){
+    newState.materials = action.payload;
+  }
   return newState;
 }

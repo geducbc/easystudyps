@@ -1,16 +1,49 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studyapp/learning_course.dart';
 import 'package:studyapp/redux/actions.dart';
 import 'package:studyapp/model/app_state.dart';
+import 'dart:async';
 
-class LandingPage extends StatelessWidget{
+class LandingPage extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return _LandingPage();
+  }
+  
+}
+
+class _LandingPage extends State<LandingPage>{
+  String username = "";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+  getAppState() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> userData = json.decode(prefs.getString('user'));
+    // username = userData['firstName'] + " " + userData["lastName"];
+    setState(() {
+      username = userData['firstName'].toString().trim() + " " + userData["lastName"].toString().trim();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     double deviceHieght = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
+    if(username.isEmpty){
+      getAppState();
+    }
+
     // TODO: implement build
-    return ListView(
+    return StoreConnector<AppState, AppState>(converter: (store) => store.state,
+    builder: (context, state) {
+          return ListView(
       padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
       children: <Widget>[
         SafeArea(
@@ -37,7 +70,7 @@ class LandingPage extends StatelessWidget{
                 ,
                 Row(
                   children: <Widget>[
-                    Text('Bucky Damilola',
+                    Text(username,
                       style: TextStyle(fontFamily: 'Gilroy', fontWeight: FontWeight.bold, fontSize: 26),
                     )
                   ]
@@ -131,5 +164,8 @@ class LandingPage extends StatelessWidget{
     )
     ],
     );
-  }
+  
+    } 
+    ,);
+}
 }

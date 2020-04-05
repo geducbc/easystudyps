@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,8 @@ import 'package:studyapp/redux/actions.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+// import 'package:simple_permissions/simple_permissions.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PdfViewer extends StatefulWidget{
   @override
@@ -30,32 +33,137 @@ class _PdfViewerState extends State<PdfViewer>{
   int currentPage = 0;
   bool isReady = false;
   String errorMessage = '';
+  // Permission permission;
+  Permission _permission;
   @override
-  void initState() {
+  void initState(){
     // TODO: implement initState
     super.initState();
     print('state loaded');
-    
+    requestPermission();
   }
 
-   Future<File> createFileOfPdfUrl(Map<String, dynamic> material) async {
-    // final url =
-    // "https://berlin2017.droidcon.cod.newthinking.net/sites/global.droidcon.cod.newthinking.net/files/media/documents/Flutter%20-%2060FPS%20UI%20of%20the%20future%20%20-%20DroidconDE%2017.pdf";
-    // final url = "https://pdfkit.org/docs/guide.pdf";
-    final url = material['url'];
-    final filename = url.substring(url.lastIndexOf("/") + 1);
-    var request = await HttpClient().getUrl(Uri.parse(url));
-    var response = await request.close();
-    var bytes = await consolidateHttpClientResponseBytes(response);
-    String dir = (await getApplicationDocumentsDirectory()).path;
-    File file = new File('$dir/$filename');
-    print('bytes: '+ bytes.toString());
-    await file.writeAsBytes(bytes);
-    print('file binary: '+file.toString());
-    return file;
+  Future<String> get _localPath async {
+    var directory;
+    directory = await getApplicationDocumentsDirectory();
+    return directory.path;
   }
-  getDownloadMaterial(Map<String, dynamic> material){
-    createFileOfPdfUrl(material).then((f) {
+  Future<File> _localFile(String schoolLevel, String subject) async {
+    final path = await _localPath;
+    return File('$path/$schoolLevel/$subject.pdf');
+  }
+
+  Future<File> writeToExternalFiles(String subject, String materialName, String schoolLevel) async{
+    File file;
+    try{
+      final status = await Permission.storage.request();
+      print('print: ' + status.toString());
+      if(status.isGranted){
+        // await get
+        String path = (await getExternalStorageDirectory()).path;
+        print('here now pdf file path');
+        file = File('$path/Documents/easystudy/resources/$schoolLevel/$subject/$materialName.pdf');
+        return file;
+      }
+      throw 'Could not luanch file';
+    }catch(error){
+      print('some errors were encountered: '+ error.toString());
+      throw 'Could not luanch file';
+    }
+  }
+
+   requestPermission() async{
+    final status = await Permission.storage.request();
+    if(status.isGranted){
+      print('permission is granted');
+    }
+    print('permission is not granted');
+  }
+
+  Future<bool> checkIfMaterialExistInStorage(String schoolLevel, String subject, String materialName) async{
+    final status = await Permission.storage.request();
+    File file;
+    if(status.isGranted){
+      String path = (await getExternalStorageDirectory()).path;
+        print('here now pdf file path');
+        file = File('$path/Documents/easystudy/resources/$schoolLevel/$subject/$materialName.pdf');
+        return await file.exists();
+    }
+    throw 'Some errors encountered opening file path';
+  }
+
+  Future<File> getMaterialFromStorage(String schoolLevel, String subject, String materialName) async{
+    final status = await Permission.storage.request();
+    File file;
+    if(status.isGranted){
+      String path = (await getExternalStorageDirectory()).path;
+        print('here now pdf file path');
+        File file = File('$path/Documents/easystudy/resources/$schoolLevel/$subject/$materialName.pdf');
+        return file;
+    }
+    throw 'Some errors encountered opening file path';
+  }
+
+   Future<File> createFileOfPdfUrl(Map<String, dynamic> material, String schoolLevel) async {
+     try{
+          if( await checkIfMaterialExistInStorage(schoolLevel, material['subject'], material['file_name'])){
+              print('fetching from local storage');
+              var file = await getMaterialFromStorage(schoolLevel, material['subject'], material['file_name']);
+              return file;
+            }else{
+              print('fetching from the internet');
+              final url = material['file_url'];
+              final filename = url.substring(url.lastIndexOf("/") + 1);
+              var request = await HttpClient().getUrl(Uri.parse(url));
+              var response = await request.close();
+              var bytes = await consolidateHttpClientResponseBytes(response);
+              String dir = (await getApplicationDocumentsDirectory()).path;
+              File file = new File('$dir/$filename');
+              // print('bytes: '+ bytes.toString());
+              await file.writeAsBytes(bytes);
+
+              File localFileMaterial = await writeToExternalFiles(material['subject'], material['file_name'], schoolLevel);
+              if(!(await localFileMaterial.exists())){
+                print('file does not exists');
+                await localFileMaterial.create(recursive: true);
+                print('file and file path created');
+                await localFileMaterial.writeAsBytes(bytes);
+                print('file wrtten to: '+ localFileMaterial.path.toString());
+
+              }
+              return file;
+            }
+     }catch(error){
+        print('fetching from the internet');
+        final url = material['file_url'];
+        final filename = url.substring(url.lastIndexOf("/") + 1);
+        var request = await HttpClient().getUrl(Uri.parse(url));
+        var response = await request.close();
+        var bytes = await consolidateHttpClientResponseBytes(response);
+        String dir = (await getApplicationDocumentsDirectory()).path;
+        File file = new File('$dir/$filename');
+        // print('bytes: '+ bytes.toString());
+        await file.writeAsBytes(bytes);
+        return file;
+     }
+    
+  }
+    Future<File> readcontent(String schoolLevel, String subject ) async {
+      try {
+        final file = await _localFile(schoolLevel, subject);
+        // Read the file
+        var fileReaded = await file.readAsBytes();
+        String dir = (await getApplicationDocumentsDirectory()).path;
+        File files = new File('$dir/$schoolLevel/$subject.pdf');
+        var fileRead = files.writeAsBytes(fileReaded);
+        return fileRead;
+      } catch (e) {
+        // If there is an error reading, return a default String
+        throw 'Error';
+      }
+    }
+  getDownloadMaterial(Map<String, dynamic> material, String schoolLevel){
+    createFileOfPdfUrl(material, schoolLevel).then((f) {
       setState(() {
         pathPDF = f.path;
         print('pfg of is: '+pathPDF);
@@ -74,7 +182,7 @@ class _PdfViewerState extends State<PdfViewer>{
       converter: (store) => store.state,
       builder: (context, state) {
         if(pathPDF.isEmpty){
-          getDownloadMaterial(state.selectedMaterial);
+          getDownloadMaterial(state.selectedMaterial, state.schoolLevel);
         }
         print('selected: '+ state.selectedMaterial.toString());
         if(state.selectedMaterial != null){
@@ -162,7 +270,7 @@ class _PdfViewerState extends State<PdfViewer>{
           body: Stack(children: <Widget>[
                 pathPDF.isNotEmpty ? PDFViewerScaffold(
         appBar: AppBar(
-          title: Text(state.selectedMaterial['name']),
+          title: Text(state.selectedMaterial['file_name']),
           actions: <Widget>[
             IconButton(
               icon: Icon(LineIcons.sticky_note_o),
