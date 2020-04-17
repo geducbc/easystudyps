@@ -41,7 +41,7 @@ class _LoginState extends State<Login>{
   void initState() {
     
     super.initState();
-    appName = 'EASY STUDY';
+    appName = 'Easy StudyPS';
     // _firestore.settings({
     //   sslEnabled: false,
     //   persistenceEnabled: false,
@@ -55,7 +55,7 @@ class _LoginState extends State<Login>{
     _formKey.currentState.save();
     if(_emailAddress.isEmpty || _pin.isEmpty || _firstName.isEmpty || _lastName.isEmpty){
       return setState((){
-          errorMessage = "Email with school school activation pin is required";
+          errorMessage = "Email, School Activation, Fist Name and Last Name pin are required";
       });
     }
     // call the api to activat school
@@ -183,8 +183,12 @@ class _LoginState extends State<Login>{
           Navigator.of(context).pushReplacementNamed('/app');
       }catch(error){
         // print('error message: '+ error.message);
-        print('error is in here: '+ error.toString());
-        Navigator.of(context).pop();
+        if(error.code == 'auth/email-already-exists'){
+          setState(() {
+            errorMessage = "Email Already exists";
+          });
+        }
+        return Navigator.of(context).pop();
       }
       
   }

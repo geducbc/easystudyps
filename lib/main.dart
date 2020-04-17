@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studyapp/pages/LandingPage.dart';
 import 'package:studyapp/pages/SubjectDetailPage.dart';
+import 'package:studyapp/pages/assesmentDetail.dart';
 import 'package:studyapp/pages/chatroom.dart';
 import 'package:studyapp/pages/classroom.dart';
 import 'package:studyapp/pages/home.dart';
 import 'package:studyapp/pages/learning.dart';
 import 'package:studyapp/pages/login.dart';
+import 'package:studyapp/pages/notifications.dart';
 import 'package:studyapp/pages/pdfViewer.dart';
 import 'package:studyapp/pages/profile.dart';
 import 'package:redux/redux.dart';
@@ -64,7 +66,10 @@ class MyApp extends StatelessWidget {
                         '/viewsubject': (context) => SubjectDetailPage(),
                         '/pdfview': (context) => PdfViewer(),
                         '/videoView': (context) => VideoPlayerWidget(),
-                        '/chatroom': (context) => ChatRoom()
+                        '/chatroom': (context) => ChatRoom(),
+                        '/notifications': (context) => Notifications(),
+                        '/assessmentDetail': (context) => AssessmentDetailPage()
+
                       },
                       onGenerateRoute: (RouteSettings setting){
                         final List<String> pathElements = setting.name.split('/');

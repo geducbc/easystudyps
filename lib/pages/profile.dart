@@ -50,7 +50,12 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return StoreConnector<AppState, AppState>(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('My Profile'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body:StoreConnector<AppState, AppState>(
         builder: (context, state) {
           return GestureDetector(
                 onTap: (){ FocusScope.of(context).requestFocus(FocusNode());},
@@ -58,15 +63,18 @@ class _ProfileState extends State<Profile> {
                             child: Column(
                               children:<Widget>[
                                     Container(
-                                        color: Colors.greenAccent,
+                                        // color: Colors.greenAccent,
                                         width: double.infinity,
-                                        padding: EdgeInsets.symmetric(vertical: 60.0, horizontal: 40.0),
+                                        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
                                         child: Row(
                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                   children: <Widget>[
-                                                    Container(
-                                                        width: 120.0,
-                                                        height: 120.0,
+                                                    Card(
+                                                      elevation: 6.0,
+                                                      shape: CircleBorder(),
+                                                      child: Container(
+                                                        width: 200.0,
+                                                        height: 200.0,
                                                         decoration: new BoxDecoration(
                                                           // color: Colors.orange,
                                                           shape: BoxShape.circle,
@@ -80,8 +88,8 @@ class _ProfileState extends State<Profile> {
                                                                   if(snapshot.hasData){
                                                                     return Text(snapshot.data,
                                                                             style: TextStyle(
-                                                                              color: Colors.white, fontFamily: 'Gilroy', fontWeight: FontWeight.bold, 
-                                                                              fontSize: 26.0
+                                                                              color: Colors.black, fontFamily: 'Gilroy', fontWeight: FontWeight.bold, 
+                                                                              fontSize: 60
                                                                             ),
                                                                           );
                                                                   }
@@ -91,13 +99,18 @@ class _ProfileState extends State<Profile> {
                                                             })
                                                         ),
                                                       ),
-                                                      Container(
+                                                    ),
+                                                      Card(
+                                                        elevation: 4.0,
+                                                        shape: CircleBorder(),
+                                                        child: Container(
                                                         child: IconButton(
                                                           iconSize: 32.0,
-                                                          icon: Icon(LineIcons.camera_retro) ,
+                                                          icon: Icon(Icons.camera_alt) ,
                                                         onPressed: (){
                                                           print('change photo requested');
                                                         }),
+                                                      ),
                                                       )
                                                 ],
                                                 )
@@ -357,7 +370,9 @@ class _ProfileState extends State<Profile> {
                             )
                 );
         },
-        converter: (store) => store.state ,);
+        converter: (store) => store.state ,
+        ) 
+    );
      
     
   }

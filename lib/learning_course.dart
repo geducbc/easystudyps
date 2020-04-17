@@ -44,7 +44,7 @@ class LearningCourse extends StatelessWidget{
     final double progess = recentCourses[index]['progress'];
     return Container(
             width: deviceWidth * 0.6,
-            margin: EdgeInsets.symmetric(horizontal: 8.0),
+            margin: EdgeInsets.symmetric(horizontal: 0.5),
             
             child: FlatButton(
               onPressed: (){

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:studyapp/pages/LandingPage.dart';
+import 'package:studyapp/pages/assessment.dart';
 import 'package:studyapp/pages/classroom.dart';
 import 'package:studyapp/pages/learning.dart';
 import 'package:studyapp/pages/profile.dart';
@@ -33,7 +34,8 @@ class _HomeState extends State<Home>{
     LandingPage(),
     Learning(),
     ClassRoom(),
-    Profile(),
+    // Profile(),
+    Assessment()
     
   ];
 
@@ -82,8 +84,8 @@ class _HomeState extends State<Home>{
                     text: 'Classroom',
                   ),
                   GButton(
-                    icon: LineIcons.user,
-                    text: 'Profile',
+                    icon: Icons.storage,
+                    text: 'Assessments',
                   ),
                 ],
                 selectedIndex: state.selectedTabIndex,
