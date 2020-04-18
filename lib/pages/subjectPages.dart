@@ -9,6 +9,7 @@ import 'package:studyapp/pages/home.dart';
 import 'package:studyapp/redux/actions.dart';
 import 'package:studyapp/model/app_state.dart';
 import 'package:http/http.dart' as http;
+import 'package:studyapp/util/colors.dart';
 
 class SelectSubjectPage extends StatefulWidget {
   final String classSelected;
@@ -21,6 +22,8 @@ class SelectSubjectPage extends StatefulWidget {
 class SelectedSubjectState extends State<SelectSubjectPage>{
   var subjects = [];
   final String user = 'Bukola Damola';
+  AppColors _appColor = AppColors();
+  int index = 0;
   @override
   void initState() {
     // TODO: implement initState
@@ -375,15 +378,57 @@ class SelectedSubjectState extends State<SelectSubjectPage>{
         builder: (context, AsyncSnapshot snapshot){
            if(snapshot.connectionState == ConnectionState.done){
              if(snapshot.hasData){
-               print(snapshot.data);
                return  StoreConnector<AppState,AppState>(converter: (store) => store.state,
                 builder: (context, state){
-                  return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                          Expanded(
-                            child: ListView(children: <Widget>[
-                          Container(child: GridView.count(
+                  return ListView(
+                            padding: EdgeInsets.symmetric(vertical: 20.0, horizontal:16.0),
+                            children: snapshot.data.map<Widget>((var item){
+                                return Card(
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                                              child: ListTile(
+                                              onTap: () {
+                                                _hanldeNavigationToCourseDetailPage(item, state.schoolLevel);
+                                              },
+                                              leading: CircleAvatar(
+                                                radius: 20.0,
+                                                backgroundColor: _appColor.getBackgroundColor(item['subject']) ,
+                                                child: Text(item['subject'].substring(0, 1).toUpperCase(),
+                                                  style: TextStyle(
+                                                    color:Colors.white, fontFamily: 'Gilroy',
+                                                    fontSize: 18.0, fontWeight: FontWeight.bold
+                                                    ),
+                                                ),
+                                              ),
+                                              title: Text(item['subject'],
+                                                style: TextStyle(
+                                                    color:Colors.black, fontFamily: 'Gilroy',
+                                                    fontSize: 16.0, fontWeight: FontWeight.bold
+                                                    ),
+                                              ),
+                                              trailing: Icon(Icons.arrow_forward_ios),
+                                            )
+                                            ),
+                                          );
+                                }
+                            ).toList()
+                          );
+                },
+               );
+             }
+             return Container(color: Colors.white);
+           }
+           return Container(color: Colors.white);
+        },),
+    );
+        },
+    
+        converter: (store) => store.state ,);
+  }
+}
+
+/*
+GridView.count(
                           padding: const EdgeInsets.all(20),
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
@@ -391,11 +436,11 @@ class SelectedSubjectState extends State<SelectSubjectPage>{
                           physics: ScrollPhysics(), // to disable GridView's scrolling
                           shrinkWrap: true,
                           children: snapshot.data.map<Widget>((var item){
-                            count = count + 1;
+                            index = index + 1;
                             return GestureDetector(child: Container(
                                             // width: 300,
                                             decoration: BoxDecoration(
-                                              color: count / 2 == 0 ? Colors.deepPurpleAccent : Colors.deepPurple,
+                                              color: index % 2 == 0 ? Colors.deepOrangeAccent : Colors.deepPurpleAccent ,
                                               borderRadius: BorderRadius.all(Radius.circular(16.0)),
                                               boxShadow: [
                                                           new BoxShadow(
@@ -420,20 +465,6 @@ class SelectedSubjectState extends State<SelectSubjectPage>{
                                         }
                                         ,);
                           }).toList(),
-                        ))
-                        ],),
-                          )
-                        ],);
-                },
-               );
-             }
-             return Container(color: Colors.white);
-           }
-           return Container(color: Colors.white);
-        },),
-    );
-        },
-    
-        converter: (store) => store.state ,);
-  }
-}
+                        )
+
+*/

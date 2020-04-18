@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studyapp/model/test.dart';
 
 class TabIndex{
   final int payload;
@@ -38,4 +39,9 @@ class SchoolLevel{
 class MaterialLoaded{
   final List<dynamic> payload;
   MaterialLoaded(this.payload);
+}
+
+class OnTestSelected{
+  final Test payload;
+  OnTestSelected(this.payload);
 }

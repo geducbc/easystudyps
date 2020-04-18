@@ -2,9 +2,15 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studyapp/model/appUser.dart';
-
+import 'package:studyapp/model/app_state.dart';
+import 'package:studyapp/model/options.dart';
+import 'package:studyapp/model/question.dart';
+import 'package:studyapp/model/test.dart';
+import 'package:studyapp/util/colors.dart';
+import 'package:studyapp/redux/actions.dart';
 
 class Assessment extends StatefulWidget{
   @override
@@ -14,7 +20,8 @@ class Assessment extends StatefulWidget{
 class _AssessmentState extends State<Assessment>{
   Firestore _firestore = Firestore.instance;
   AppUser _appUser = AppUser();
-
+  AppColors _appColor = AppColors();
+  int index = 0;
   Future<AppUser> getUserDetails() async{
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     var user = json.decode(_prefs.getString('user'));
@@ -25,9 +32,37 @@ class _AssessmentState extends State<Assessment>{
   }
 
   gotoAssessmentDetailPage(BuildContext context, DocumentSnapshot doc){
-    print('pressed');
-    Navigator.of(context).pushNamed('/assessmentDetail');
     print(doc.data);
+    print(doc.documentID);
+    // [].forEach((element) { })
+    // Navigator.of(context).pushNamed('/assessmentDetail');
+    // List<Options> _options = Options(answer: null, option: null);
+    // List<Questions> _question = Questions(images: null, options: null, questionMark: null, hasImage: null, correctOption: null)
+    try{
+        List<Questions> _question = List<Questions>();
+        doc['questions'].forEach((var question) {
+            List<Options> _options = List<Options>();
+            question['options'].forEach((var element){
+              _options.add(Options(answer: element['answer'], option: element['option']));
+            });
+            _question.add(Questions(images: question['image'], options: _options, 
+            questionMark: question['questionMark'], hasImage: 
+            question['hasImage'], correctOption: question['correctionOption'], question: question['question']));
+        });
+        
+        Test _test = Test(schoolLevel: doc['schoolLevel'], quizName: doc['quizName'], 
+            subject: doc['subject'], questions: _question, isTimed: doc['isTimed'], 
+              createdBy: doc['createdBy'], studentClass: doc['studentClass'], 
+              createdAt: doc['createdAt'], validUntil: doc['validUntil'], 
+              numberOfQuestions: doc['numberOfQuestions'], 
+              numberOfMinutesToComplete: doc['numberOfMinutesToComplete'], 
+              schoolCode: doc['schoolCode'], totalValidMarks: doc['totalValidMarks'], id: doc.documentID);
+        StoreProvider.of<AppState>(context).dispatch(OnTestSelected(_test));
+        Navigator.of(context).pushNamed('/assessmentDetail');
+    }catch(error){
+      print(error);
+    }
+    
   }
 
   @override
@@ -57,16 +92,17 @@ class _AssessmentState extends State<Assessment>{
                                   child: 
                                     ListView(
                                       children: snapshot.data.documents.map((DocumentSnapshot doc){
+                                        index = index + 1;
                                         return Card(
                                             child: Container(
-                                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                                              padding: EdgeInsets.symmetric(vertical: 8.0),
                                               child: ListTile(
                                               onTap: () {
                                                 gotoAssessmentDetailPage(context, doc);
                                               },
                                               leading: CircleAvatar(
                                                 radius: 20.0,
-                                                backgroundColor: Colors.deepOrangeAccent,
+                                                backgroundColor: _appColor.getBackgroundColor(doc['subject']) ,
                                                 child: Text(doc['subject'].substring(0, 1).toUpperCase(),
                                                   style: TextStyle(
                                                     color:Colors.white, fontFamily: 'Gilroy',

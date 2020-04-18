@@ -25,5 +25,8 @@ AppState reducer(AppState prevState, dynamic action){
   if(action is MaterialLoaded){
     newState.materials = action.payload;
   }
+  if(action is OnTestSelected){
+    newState.testSelected = action.payload;
+  }
   return newState;
 }

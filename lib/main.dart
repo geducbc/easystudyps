@@ -16,6 +16,7 @@ import 'package:studyapp/pages/profile.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:studyapp/model/app_state.dart';
+import 'package:studyapp/pages/quiz.dart';
 import 'package:studyapp/pages/subjectPages.dart';
 import 'package:studyapp/pages/videoPlayer.dart';
 import 'package:studyapp/redux/reducers.dart';
@@ -68,8 +69,8 @@ class MyApp extends StatelessWidget {
                         '/videoView': (context) => VideoPlayerWidget(),
                         '/chatroom': (context) => ChatRoom(),
                         '/notifications': (context) => Notifications(),
-                        '/assessmentDetail': (context) => AssessmentDetailPage()
-
+                        '/assessmentDetail': (context) => AssessmentDetailPage(),
+                        '/quiz': (context) => Quiz()
                       },
                       onGenerateRoute: (RouteSettings setting){
                         final List<String> pathElements = setting.name.split('/');
